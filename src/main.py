@@ -60,6 +60,48 @@ if __name__ == "__main__":
     async def assign(ctx):
         role = discord.utils.get(ctx.guild.roles, name=secret_role)
 
+        if role:
+            await ctx.author.add_roles(role)
+            await ctx.send(f"{ctx.author.mention}, you have been given the {secret_role} role.")
+
+        else: 
+            await ctx.send(f"Role {secret_role} not found.")
+
+    @bot.command()
+    async def remove(ctx):
+        role = discord.utils.get(ctx.guild.roles, name=secret_role)
+
+        if role:
+            await ctx.author.remove_roles(role)
+            await ctx.send(f"{ctx.author.mention}, the {secret_role} role has been removed from you.")
+
+        else: 
+            await ctx.send(f"Role {secret_role} not found.")
+
+
+    @bot.command()
+    async def dm(ctx, *, msg):
+        try:
+            await ctx.author.send(f"You said: {msg}")
+            await ctx.send(f"{ctx.author.mention}, I've sent you a DM!")
+        except discord.Forbidden:
+            await ctx.send(f"{ctx.author.mention}, I couldn't send you a DM. Please check your privacy settings.")
+
+    @bot.command()
+    async def reply(ctx):
+        await ctx.reply(f"This is a reply to your message, {ctx.author.mention}!")
+
+
+    @bot.command()
+    @commands.has_role(secret_role)
+    async def secret(ctx):
+        await ctx.send("Welcome to the club!")
+    
+    @secret.error
+    async def secret_error(ctx, error):
+        if isinstance(error, commands.MissingRole):
+            await ctx.send(f"you dont have permission to do that")
+
 
 
     bot.run(TOKEN, log_handler=handler, log_level=logging.DEBUG)
